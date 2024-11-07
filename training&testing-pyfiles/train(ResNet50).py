@@ -1,22 +1,23 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D,MaxPooling2D,Flatten,Dense
-from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D # type: ignore
+from tensorflow.keras.applications import ResNet50 # type: ignore
+from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 import pickle
-from tensorflow import keras 
 
-train_data= "data/train"
-test_data="dataset/Test"
-batch_size=32
-target_size=(125,125)
+train_data = "lung/Train"
+test_data = "lung/Test"
+batch_size = 32
+target_size = (125, 125)
 
+# Data generators
 train = ImageDataGenerator(
     rescale=1/255.0,
     validation_split=0.40)
-    
+
 test = ImageDataGenerator(rescale=1/255.0)
 
 train_generator = train.flow_from_directory(
@@ -40,29 +41,35 @@ test_generator = test.flow_from_directory(
     target_size=target_size,
     batch_size=1)
 
-print(train_generator.classes)
+# Model definition
 model = Sequential()
-
-model.add(ResNet50(include_top=False,
-    weights=None,
-    input_shape=(125,125,3)))
-model.add(Flatten())
+model.add(ResNet50(include_top=False, weights='imagenet', input_shape=(125, 125, 3)))
+model.add(GlobalAveragePooling2D())
 model.add(Dense(300, activation='relu'))
 model.add(Dense(100, activation='relu'))
 model.add(Dense(3, activation='softmax'))
-model.compile(loss="categorical_crossentropy",optimizer="adam",metrics=['accuracy'])
 
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=['accuracy'])
 
-hist = model.fit(train_generator,validation_data = valid_generator,epochs=200)
+# Early stopping to prevent overfitting
+early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
+# Training
+hist = model.fit(
+    train_generator,
+    validation_data=valid_generator,
+    epochs=200,
+    callbacks=[early_stopping])
+
+# Saving model and history
 model.save("model/ResNet50(200ep)/model.h5")
 
 model_json = model.to_json()
-with open("model/Xception/model.json", "w") as json_file:
+with open("model/ResNet50(200ep)/model.json", "w") as json_file:
     json_file.write(model_json)
-    f = open('model/Xception/history.pckl', 'wb')
+
+with open("model/ResNet50(200ep)/history.pckl", "wb") as f:
     pickle.dump(hist.history, f)
-    f.close()
 
 
 

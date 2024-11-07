@@ -1,117 +1,95 @@
-import itertools
-import cv2
 import os
-import time
-
-import pandas as pd
-import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
-
-from tensorflow import keras
-from tensorflow.keras.applications.efficientnet import EfficientNetB7  as PretrainedModel, preprocess_input
-from tensorflow.keras.layers import Input, Dense, Flatten, GlobalAveragePooling2D
-from tensorflow.keras.models import Model
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import EarlyStopping
-
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-
-from glob import glob
-
 import pickle
+import numpy as np
+from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
+from tensorflow.keras.models import Model # type: ignore
+from tensorflow.keras.layers import GlobalAveragePooling2D, Flatten, Dense # type: ignore
+from tensorflow.keras.applications import EfficientNetB7 # type: ignore
+from tensorflow.keras.callbacks import EarlyStopping # type: ignore
+from tensorflow.keras.applications.efficientnet import preprocess_input  # type: ignore # Preprocessing function for EfficientNetB7
 
-folders = glob('data/train' + '/*')
-print('New Paths: ', folders)
 
-IMAGE_FILES = glob('data/train' + '/*/*.jpeg')
-print('Images Count: ', len(IMAGE_FILES))
-
-#Showing Sample Images
-
-SAMPLES = ['data/train/adenocarcinoma/lungaca1.jpeg','data/train/benign/lungn1.jpeg',
-            'data/train/squamous/lungscc1.jpeg']
-
-plt.figure(figsize=(22, 8)) 
-global c
-c = 0
-
-for i in SAMPLES:
-    plt.subplot(1, 5, c + 1)
-    c += 1
-    t = i.split('/')
-    plt.title(t[3])
-    plt.imshow(image.load_img(i))
-    plt.axis('off')
-plt.show()
-
-#Generating Data
-
-data_dir = 'data/train'
-
-# 80-20 Split
-data = ImageDataGenerator(validation_split = 0.2)
+train_dir = 'lung/Train'
+val_dir = 'lung/Val'
+test_dir = 'lung/Test'
 
 BATCH_SIZE = 128
+X = Y = 224  # Input size for EfficientNetB7
 
-# 224 x 224 -- The minimum for EfficientNetB7, you can go as high as 600 x 600
-X = Y = 224
+# Create separate data generators for train, validation, and test
+data_gen = ImageDataGenerator(preprocessing_function=preprocess_input)  # Preprocessing for EfficientNet
 
-training = data.flow_from_directory(data_dir,
-                                    class_mode = "categorical",
-                                    target_size = (X, Y),
-                                    color_mode="rgb",
-                                    batch_size = BATCH_SIZE, 
-                                    shuffle = False,
-                                    subset='training',
-                                    seed = 42)
+# Train generator
+train_generator = data_gen.flow_from_directory(
+    directory=train_dir,
+    target_size=(X, Y),
+    batch_size=BATCH_SIZE,
+    class_mode='categorical',
+    color_mode="rgb",
+    shuffle=True,
+    seed=42
+)
 
-validation = data.flow_from_directory(data_dir,
-                                      class_mode = "categorical",
-                                      target_size = (X, Y),
-                                      color_mode="rgb",
-                                      batch_size = BATCH_SIZE, 
-                                      shuffle = False,
-                                      subset='validation',
-                                      seed = 42)
+# Validation generator
+val_generator = data_gen.flow_from_directory(
+    directory=val_dir,
+    target_size=(X, Y),
+    batch_size=BATCH_SIZE,
+    class_mode='categorical',
+    color_mode="rgb",
+    shuffle=False,
+    seed=42
+)
 
-ptm = PretrainedModel(
+# Test generator (if you want to use it for evaluation later)
+test_generator = data_gen.flow_from_directory(
+    directory=test_dir,
+    target_size=(X, Y),
+    batch_size=BATCH_SIZE,
+    class_mode='categorical',
+    color_mode="rgb",
+    shuffle=False,
+    seed=42
+)
+
+# Load the EfficientNetB7 model without the top layers and freeze it
+ptm = EfficientNetB7(
     input_shape=(X, Y, 3),
-    weights='imagenet',
-    include_top=False)
+    weights='imagenet',  # Load pre-trained weights from ImageNet
+    include_top=False    # Exclude the top fully connected layers
+)
 
 ptm.trainable = False
 
-K = len(folders)
-
+# Add custom layers on top of EfficientNetB7
 x = GlobalAveragePooling2D()(ptm.output)
 x = Flatten()(x)
 x = Dense(128, activation='relu')(x)
 x = Dense(64, activation='relu')(x)
-
-y = Dense(K, activation='softmax')(x)
+y = Dense(len(folders), activation='softmax')(x) # type: ignore
 
 model = Model(inputs=ptm.input, outputs=y)
 
+# Compile the model
 model.compile(
-  loss='categorical_crossentropy',
-  optimizer='adam',
-  metrics=['accuracy']
+    loss='categorical_crossentropy',
+    optimizer='adam',
+    metrics=['accuracy']
 )
 
+# Train the model
 early_stopping = EarlyStopping(monitor='val_loss', patience=3)
-
 hist = model.fit(
-    training,
-    validation_data=validation,
+    train_generator,
+    validation_data=val_generator,
     epochs=50,
-    callbacks=[early_stopping])
+    callbacks=[early_stopping]
+)
 
+# Save the model architecture and training history
 model_json = model.to_json()
 with open("model/EfficientNetB7/model.json", "w") as json_file:
     json_file.write(model_json)
-    f = open('model/EfficientNetB7/history.pckl', 'wb')
+with open('model/EfficientNetB7/history.pckl', 'wb') as f:
     pickle.dump(hist.history, f)
-    f.close()
 
