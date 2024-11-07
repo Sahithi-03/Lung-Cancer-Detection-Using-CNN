@@ -10,12 +10,12 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter.filedialog import askopenfile, askopenfilename
 from PIL import Image, ImageTk
-from tensorflow.keras.preprocessing.image import load_img,img_to_array
-from tensorflow.keras.models import model_from_json
+from tensorflow.keras.preprocessing.image import load_img,img_to_array # type: ignore
+from tensorflow.keras.models import model_from_json # type: ignore
 import numpy as np
-from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing import image # type: ignore
 import pickle
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model # type: ignore
 
 main = tkinter.Tk()
 main.title("LUNG CANCER DETECTION USING CNN") #designing main screen
