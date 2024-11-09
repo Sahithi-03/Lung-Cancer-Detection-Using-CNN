@@ -8,8 +8,8 @@ from tensorflow.keras.applications import ResNet50 # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 import pickle
 
-train_data = "lung/Train"
-test_data = "lung/Test"
+train_data = "C:\Project\Lung-Cancer-Detection-Using-CNN\training&testing-pyfiles\lung\Train"
+test_data = "C:\Project\Lung-Cancer-Detection-Using-CNN\training&testing-pyfiles\lung\Test"
 batch_size = 32
 target_size = (125, 125)
 
