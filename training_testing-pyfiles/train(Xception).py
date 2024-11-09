@@ -11,9 +11,9 @@ from tensorflow import keras
 
 
 # Paths for lung cancer dataset
-train_data = "lung/Train"
-val_data = "lung/Val"  # Validation data path
-test_data = "lung/Test"  # Test data path
+train_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Train"
+val_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Val"  # Validation data path
+test_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Test"  # Test data path
 
 # Set batch size and target image size
 batch_size = 32

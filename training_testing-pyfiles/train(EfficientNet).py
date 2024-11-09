@@ -9,9 +9,9 @@ from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 from tensorflow.keras.applications.efficientnet import preprocess_input  # type: ignore # Preprocessing function for EfficientNetB7
 
 
-train_dir = 'lung/Train'
-val_dir = 'lung/Val'
-test_dir = 'lung/Test'
+train_dir = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Train"
+val_dir = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Val"
+test_dir = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Test"
 
 BATCH_SIZE = 128
 X = Y = 224  # Input size for EfficientNetB7
@@ -82,7 +82,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=3)
 hist = model.fit(
     train_generator,
     validation_data=val_generator,
-    epochs=50,
+    epochs=10,
     callbacks=[early_stopping]
 )
 

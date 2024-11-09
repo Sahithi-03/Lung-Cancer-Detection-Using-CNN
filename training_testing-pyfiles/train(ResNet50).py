@@ -8,8 +8,9 @@ from tensorflow.keras.applications import ResNet50 # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping # type: ignore
 import pickle
 
-train_data = "C:\Project\Lung-Cancer-Detection-Using-CNN\training&testing-pyfiles\lung\Train"
-test_data = "C:\Project\Lung-Cancer-Detection-Using-CNN\training&testing-pyfiles\lung\Test"
+train_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Train"
+test_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Test"
+val_data = r"C:\Project\Lung-Cancer-Detection-Using-CNN\training_testing-pyfiles\lung\Val"
 batch_size = 32
 target_size = (125, 125)
 
@@ -29,7 +30,7 @@ train_generator = train.flow_from_directory(
     subset='training')
 
 valid_generator = train.flow_from_directory(
-    directory=train_data,
+    directory=val_data,
     target_size=target_size,
     batch_size=batch_size,
     class_mode="categorical",
@@ -58,7 +59,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_wei
 hist = model.fit(
     train_generator,
     validation_data=valid_generator,
-    epochs=200,
+    epochs=10,
     callbacks=[early_stopping])
 
 # Saving model and history
