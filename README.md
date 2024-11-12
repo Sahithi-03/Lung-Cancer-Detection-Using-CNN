@@ -170,25 +170,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 
 
-<!-- CONTACT -->
-## Contact
 
-K.H.V.VIJAY KAMAL - <a href="https://mail.google.com">vijaykamalkhv@gmail.com</a>
-
-
-Project Link: [https://github.com/vijaykhv/Lung-Cancer-Detection-Using-CNN](https://github.com/vijaykhv/Lung-Cancer-Detection-Using-CNN)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-
-<body>
-<a href ="https://github.com/vijaykhv" ><i class="fa fa-github fa-3x">  Git hub</i></a>
-<p>
-</p>
-<p>
-</p>
-<a href ="https://discordapp.com/users/LYNX#3267"><i class="fab fa-discord fa-3x"> Discord</i></a>
-</body>
