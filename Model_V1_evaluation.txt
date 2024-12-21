@@ -1,0 +1,21 @@
+=== Evaluation Metrics for Model_V1 ===
+
+Confusion Matrix:
+[[594,   7,  24],
+ [  0, 625,   0],
+ [ 27,   0, 598]]
+
+Classification Report:
+                         precision    recall  f1-score   support
+
+         Adenocarcinoma       0.96      0.95      0.95       625
+                 Benign       0.99      1.00      0.99       625
+Squamous Cell Carcinoma       0.96      0.96      0.96       625
+
+               accuracy                           0.97      1875
+              macro avg       0.97      0.97      0.97      1875
+           weighted avg       0.97      0.97      0.97      1875
+
+
+Model Loss: 0.0892
+Model Accuracy: 96.91%
